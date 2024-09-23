@@ -8,7 +8,10 @@ namespace esphome {
 namespace tzspserial {
 
 void TZSPSerial::setup() {
-    if (xTaskCreate([](void* o){ static_cast<TZSPSerial*>(o)->uart_event_task(); }, "UART_Event", 4096, this, 12, NULL) != pdPASS) {
+    constexpr uint32_t stack_depth = 4096; // Not optimized
+    constexpr UBaseType_t task_priority = 12; // Not optimized
+
+    if (xTaskCreate([](void* o){ static_cast<TZSPSerial*>(o)->uart_event_task(); }, "UART_Event", stack_depth, this, task_priority, NULL) != pdPASS) {
         ESP_LOGE(TAG, "Failed to create event task");
         this->mark_failed();
         return;
