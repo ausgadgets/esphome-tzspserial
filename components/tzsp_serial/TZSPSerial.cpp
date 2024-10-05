@@ -32,9 +32,18 @@ void TZSPSerial::dump_config() {
     ESP_LOGCONFIG(TAG, "TZSPSerial");
     ESP_LOGCONFIG(TAG, "  Destination: %s:%u", buf, ntohs(this->tzsp_sockaddr_in_.sin_port));
     ESP_LOGCONFIG(TAG, "  Protocol: %u", ntohs(this->tzsp_protocol_));
+    ESP_LOGCONFIG(TAG, "  Discard protocol: %u", ntohs(this->tzsp_discard_protocol_));
     ESP_LOGCONFIG(TAG, "  Frame size: %u", this->frame_size_);
     ESP_LOGCONFIG(TAG, "  Symbol timeout: %u", this->symbol_timeout_);
     ESP_LOGCONFIG(TAG, "  Inverted: %s", this->inverted_ ? "YES" : "NO");
+}
+
+void TZSPSerial::load_buffer(std::vector<uint8_t>& buffer) {
+    this->read_array(buffer.data(), buffer.size());
+
+    if (this->inverted_)
+        for (auto &b : buffer)
+            b ^= 0xFF;
 }
 
 void TZSPSerial::uart_event_task() {
@@ -49,17 +58,16 @@ void TZSPSerial::uart_event_task() {
 
                     uart_get_buffered_data_len(static_cast<uart::IDFUARTComponent*>(this->parent_)->get_hw_serial_number(), &bufferLen);
                     if (auto discard = bufferLen % buffer.size()) {
-                        this->read_array(buffer.data(), discard);
+                        std::vector<uint8_t> discard_buffer(discard);
+
+                        this->load_buffer(discard_buffer);
+                        this->tzsp_send(discard_buffer, this->tzsp_discard_protocol_);
+
                         ESP_LOGD(TAG, "Discarded %d bytes", discard);
                     }
 
                     for (auto i = 0; i < event.size / buffer.size(); i++) {
-                        this->read_array(buffer.data(), buffer.size());
-
-                        if (this->inverted_)
-                            for (auto &b : buffer)
-                                b ^= 0xFF;
-
+                        this->load_buffer(buffer);
                         this->tzsp_send(buffer);
                     }
 
