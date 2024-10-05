@@ -17,14 +17,15 @@ class TZSPSerial : public Component, public uart::UARTDevice, public tzsp::TZSPS
 
     void setup() override;
     void dump_config() override;
-    float get_setup_priority() const override { return esphome::setup_priority::AFTER_WIFI; }
 
     void set_frame_size(size_t frame_size) { this->frame_size_ = frame_size; }
-    void set_inverted(size_t inverted) { this->inverted_ = inverted; }
+    void set_symbol_timeout(uint8_t symbol_timeout) { this->symbol_timeout_ = symbol_timeout; }
+    void set_inverted(bool inverted) { this->inverted_ = inverted; }
 
   protected:
-    size_t frame_size_;
-    bool inverted_;
+    size_t frame_size_{};
+    uint8_t symbol_timeout_{};
+    bool inverted_{};
 
   private:
     uart::IDFUARTComponent* idf_uart;

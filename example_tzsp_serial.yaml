@@ -55,6 +55,7 @@ uart:
 
 tzsp_serial:
   frame_size: 8
+  symbol_timeout: 2
   inverted: true
   tzsp:
     ip: 192.168.1.10
