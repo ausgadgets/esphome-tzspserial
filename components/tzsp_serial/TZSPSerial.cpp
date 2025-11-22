@@ -27,8 +27,8 @@ void TZSPSerial::setup() {
 }
 
 void TZSPSerial::dump_config() {
-    char buf[INET_ADDRSTRLEN]; \
-    inet_ntop(this->tzsp_sockaddr_in_.sin_family, &this->tzsp_sockaddr_in_.sin_addr, buf, INET_ADDRSTRLEN); \
+    char buf[INET_ADDRSTRLEN]; 
+    inet_ntop(this->tzsp_sockaddr_in_.sin_family, &this->tzsp_sockaddr_in_.sin_addr, buf, INET_ADDRSTRLEN); 
 
     ESP_LOGCONFIG(TAG, "TZSPSerial");
     ESP_LOGCONFIG(TAG, "  Destination: %s:%u", buf, ntohs(this->tzsp_sockaddr_in_.sin_port));
