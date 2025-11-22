@@ -11,7 +11,8 @@ void TZSPSerial::setup() {
     constexpr uint32_t stack_depth = 4096; // Not optimized
     constexpr UBaseType_t task_priority = 12; // Not optimized
 
-    int err = uart_set_rx_timeout(this->idf_uart->get_hw_serial_number(), this->symbol_timeout_);
+    int err = uart_set_rx_timeout(static_cast<uart_port_t>(this->idf_uart->get_hw_serial_number()), this->symbol_timeout_);
+
     if (err != ESP_OK) {
         ESP_LOGE(TAG, "Failed to set UART RX timeout: %s", esp_err_to_name(err));
         this->mark_failed();
