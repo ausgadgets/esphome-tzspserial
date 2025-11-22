@@ -57,7 +57,8 @@ void TZSPSerial::uart_event_task() {
                 [[likely]] case UART_DATA:
                     size_t bufferLen;
 
-                    uart_get_buffered_data_len(static_cast<uart::IDFUARTComponent*>(this->parent_)->get_hw_serial_number(), &bufferLen);
+                    uart_get_buffered_data_len(static_cast<uart_port_t>(static_cast<uart::IDFUARTComponent*>(this->parent_)->get_hw_serial_number()), &bufferLen);
+
                     if (auto discard = bufferLen % buffer.size()) {
                         std::vector<uint8_t> discard_buffer(discard);
 
